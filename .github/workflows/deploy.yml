@@ -1,0 +1,38 @@
+name: Deploy to cPanel
+
+on:
+ push:
+  branches:
+    - main
+
+jobs:
+  build-and-Deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get latest code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: "npm"
+    - name: Install pnpm
+      run: npm install -g pnpm
+    
+    - name: Install Dependencies
+      run: pnpm install
+    
+    - name: build project
+      run: pnpm run build
+    
+    - name: deploy to cPanel
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      with:
+        server: ftp.samkirkland.com
+        username: username
+        password: password
+        protocol: ftps
+        local-dir: ./out/
+        server-dir: ./public_html
+        dangerous-clean-slate: true
